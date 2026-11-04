@@ -14,8 +14,8 @@ public static class SiteInfo
     public const string YouTube = "https://www.youtube.com/channel/UC2iybVI2TE2LQ6straknrnA";
     public const string Twitch = "https://www.twitch.tv/thedevtalkshow";
 
-    /// <summary>Public GitHub repo URL. Leave empty until the repo is published; links are hidden while empty.</summary>
-    public const string GitHubRepo = "";
+    /// <summary>Public GitHub repo URL. Links to it are hidden while empty.</summary>
+    public const string GitHubRepo = "https://github.com/thedevtalkshow/tdtsweb";
 
     public static string? SourceUrl(string contentFolder, string fileName) =>
         string.IsNullOrEmpty(GitHubRepo)
