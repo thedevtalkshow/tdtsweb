@@ -1,0 +1,98 @@
+@page "/episodes"
+@page "/episodes/{fileName}"
+@inject BlazorStaticContentService<EpisodeFrontMatter> EpisodeService
+
+@if (string.IsNullOrWhiteSpace(FileName))
+{
+    <PageTitle>Episodes · @SiteInfo.Title</PageTitle>
+    <header class="page-head">
+        <h1>Episodes</h1>
+        <p>Every show with its notes and links. The full archive is also on <a href="@SiteInfo.YouTube" target="_blank" rel="noopener noreferrer">YouTube</a>.</p>
+    </header>
+    @if (EpisodeService.Posts.Count == 0)
+    {
+        <p class="empty">No episodes have been added here yet.</p>
+    }
+    else
+    {
+        <ol class="rows">
+            @foreach (var episode in EpisodeService.Posts.OrderByDescending(x => x.FrontMatter.Aired))
+            {
+                <EpisodeRow Episode="episode" ShowThumbnail="true"/>
+            }
+        </ol>
+    }
+    return;
+}
+
+@if (_episode == null)
+{
+    <PageTitle>Episode not found · @SiteInfo.Title</PageTitle>
+    <div class="page-head"><h1>Episode not found</h1><p><a href="episodes">See all episodes</a></p></div>
+    return;
+}
+
+@{ var fm = _episode.FrontMatter; }
+<PageTitle>@fm.Title · @SiteInfo.Title</PageTitle>
+<HeadContent>
+    <meta name="description" content="@fm.Lead"/>
+    <meta property="og:image" content="@fm.ThumbnailUrl"/>
+</HeadContent>
+
+<article class="article article--wide">
+    <header class="article__head">
+        <Datebox Date="fm.Aired" ShowYear="true"/>
+        <div>
+            <h1>@fm.Title</h1>
+            @if (!string.IsNullOrWhiteSpace(fm.Lead))
+            {
+                <p class="article__byline">@fm.Lead</p>
+            }
+        </div>
+    </header>
+
+    <div class="article__video">
+        <iframe src="@fm.EmbedUrl" title="@fm.Title" loading="lazy"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+
+    <dl class="article__facts">
+        @if (fm.Hosts.Count > 0)
+        {
+            <div><dt>Hosts</dt><dd>@string.Join(" & ", fm.Hosts.Select(h => People.Resolve(h).Name))</dd></div>
+        }
+        @if (fm.Guests.Count > 0)
+        {
+            <div><dt>Guests</dt><dd>@string.Join(", ", fm.Guests)</dd></div>
+        }
+        @if (fm.Tags.Count > 0)
+        {
+            <div><dt>Topics</dt><dd>@string.Join(", ", fm.Tags)</dd></div>
+        }
+    </dl>
+
+    <div class="prose">
+        @((MarkupString)_episode.HtmlContent)
+    </div>
+
+    <footer class="article__foot">
+        <a href="episodes">All episodes</a>
+        <a href="@fm.WatchUrl" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>
+        @if (SiteInfo.SourceUrl("Episodes", FileName) is { } sourceUrl)
+        {
+            <a href="@sourceUrl" target="_blank" rel="noopener noreferrer">Suggest an edit</a>
+        }
+    </footer>
+</article>
+
+@code {
+    [Parameter] public string? FileName { get; set; }
+    private Post<EpisodeFrontMatter>? _episode;
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(FileName)) return;
+        _episode = EpisodeService.Posts.FirstOrDefault(x => x.Url == FileName);
+    }
+}

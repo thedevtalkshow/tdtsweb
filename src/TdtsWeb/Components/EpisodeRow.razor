@@ -1,0 +1,26 @@
+@inject BlazorStaticContentService<EpisodeFrontMatter> EpisodeService
+
+@{ var fm = Episode.FrontMatter; var url = $"{EpisodeService.Options.PageUrl}/{Episode.Url}"; }
+<li class="row @(ShowThumbnail ? "row--thumb" : "")">
+    <Datebox Date="fm.Aired"/>
+    <div>
+        <h3 class="row__title"><a href="@url">@fm.Title</a></h3>
+        @if (fm.Guests.Count > 0)
+        {
+            <p class="row__meta">With @string.Join(", ", fm.Guests)</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(fm.Lead))
+        {
+            <p class="row__lead">@fm.Lead</p>
+        }
+    </div>
+    @if (ShowThumbnail)
+    {
+        <a class="row__thumb" href="@url" tabindex="-1" aria-hidden="true"><img src="@fm.ThumbnailUrl" alt="" loading="lazy"/></a>
+    }
+</li>
+
+@code {
+    [Parameter, EditorRequired] public Post<EpisodeFrontMatter> Episode { get; set; } = default!;
+    [Parameter] public bool ShowThumbnail { get; set; }
+}

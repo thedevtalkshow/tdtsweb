@@ -1,0 +1,23 @@
+@inject BlazorStaticContentService<PostFrontMatter> PostService
+
+<ol class="rows">
+    @foreach (var post in (Posts ?? PostService.Posts).OrderByDescending(x => x.FrontMatter.Published))
+    {
+        var fm = post.FrontMatter;
+        <li class="row">
+            <Datebox Date="fm.Published"/>
+            <div>
+                <h3 class="row__title"><a href="@PostService.Options.PageUrl/@post.Url">@fm.Title</a></h3>
+                @if (!string.IsNullOrWhiteSpace(fm.Lead))
+                {
+                    <p class="row__lead">@fm.Lead</p>
+                }
+                <TagsComponent Tags="fm.Tags"/>
+            </div>
+        </li>
+    }
+</ol>
+
+@code {
+    [Parameter] public List<Post<PostFrontMatter>>? Posts { get; set; }
+}

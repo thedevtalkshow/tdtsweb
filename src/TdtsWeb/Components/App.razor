@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="@SiteInfo.Tagline"/>
+    <meta name="theme-color" content="#f7fafc"/>
+    <base href="@BaseHref"/>
+    <link rel="preload" href="fonts/zilla-slab-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin/>
+    <link rel="stylesheet" href="css/site.css"/>
+    <link rel="icon" type="image/png" href="favicon.png"/>
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png"/>
+    <HeadOutlet/>
+</head>
+
+<body>
+<Routes/>
+</body>
+
+</html>
+
+@code {
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
+
+    // "/" on the real domain; a subpath like "/TdtsWeb/" for GitHub Pages project sites. Set via the BasePath setting.
+    private string BaseHref
+    {
+        get
+        {
+            var path = (Configuration["BasePath"] ?? "").Trim('/');
+            return path.Length == 0 ? "/" : $"/{path}/";
+        }
+    }
+}

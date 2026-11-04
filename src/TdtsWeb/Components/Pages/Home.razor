@@ -1,0 +1,89 @@
+@page "/"
+@inject BlazorStaticContentService<EpisodeFrontMatter> EpisodeService
+@inject BlazorStaticContentService<PostFrontMatter> PostService
+
+<PageTitle>@SiteInfo.Title</PageTitle>
+
+<section class="hero">
+    <div>
+        <h1 class="visually-hidden">@SiteInfo.Title</h1>
+        <div class="clock">
+            <span class="clock__sun" aria-hidden="true"></span>
+            <span class="clock__time">@SiteInfo.LiveTime</span>
+        </div>
+        <p class="hero__when">@SiteInfo.LiveWhen</p>
+        <p class="hero__lede">
+            Developers doing what developers do, live. Chris Gomez and Rich Ross work through real .NET and Azure problems
+            on stream, and the recordings land on YouTube.
+        </p>
+        <div class="hero__actions">
+            <a class="button button--sun" href="@SiteInfo.Twitch" target="_blank" rel="noopener noreferrer">Watch live on Twitch</a>
+            <a class="button" href="@SiteInfo.YouTube" target="_blank" rel="noopener noreferrer">Catch up on YouTube</a>
+        </div>
+    </div>
+
+    @if (_latest is { } latest)
+    {
+        <a class="hero__feature" href="@EpisodeService.Options.PageUrl/@latest.Url">
+            <img src="@latest.FrontMatter.ThumbnailUrl" alt="" width="480" height="270"/>
+            <span class="hero__feature-label">Latest episode</span>
+            <span class="hero__feature-title">@latest.FrontMatter.Title</span>
+        </a>
+    }
+    else
+    {
+        <img class="hero__badge" src="img/tdts-logo.png" width="560" height="429" alt=""/>
+    }
+</section>
+
+<section class="section" aria-labelledby="recent-episodes">
+    <div class="section__head">
+        <h2 id="recent-episodes">Recent episodes</h2>
+        <a href="episodes">All episodes</a>
+    </div>
+    @if (_recentEpisodes.Count == 0)
+    {
+        <p class="empty">
+            Episode pages are coming soon. Every past show is on
+            <a href="@SiteInfo.YouTube" target="_blank" rel="noopener noreferrer">YouTube</a> in the meantime.
+        </p>
+    }
+    else
+    {
+        <ol class="rows">
+            @foreach (var episode in _recentEpisodes)
+            {
+                <EpisodeRow Episode="episode"/>
+            }
+        </ol>
+    }
+</section>
+
+<section class="section" aria-labelledby="from-the-blog">
+    <div class="section__head">
+        <h2 id="from-the-blog">From the blog</h2>
+        <a href="blog">All posts</a>
+    </div>
+    @if (_recentPosts.Count == 0)
+    {
+        <p class="empty">No posts yet.</p>
+    }
+    else
+    {
+        <PostsList Posts="_recentPosts"/>
+    }
+</section>
+
+@code {
+    private Post<EpisodeFrontMatter>? _latest;
+    private List<Post<EpisodeFrontMatter>> _recentEpisodes = [];
+    private List<Post<PostFrontMatter>> _recentPosts = [];
+
+    protected override void OnInitialized()
+    {
+        var episodes = EpisodeService.Posts.OrderByDescending(x => x.FrontMatter.Aired).ToList();
+        _latest = episodes.FirstOrDefault();
+        _recentEpisodes = episodes.Skip(1).Take(5).ToList();
+        _recentPosts = PostService.Posts.OrderByDescending(x => x.FrontMatter.Published).Take(3).ToList();
+    }
+}

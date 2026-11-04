@@ -1,0 +1,54 @@
+# Trial deployment to GitHub Pages. Azure Static Web Apps is the planned production host (docs/decisions/0001).
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Generate site
+        working-directory: src/TdtsWeb
+        env:
+          ASPNETCORE_ENVIRONMENT: Production
+          # Project sites live under /<repo>/; empty when a custom domain is set.
+          BasePath: ${{ steps.pages.outputs.base_path }}
+        run: dotnet run -c Release --no-launch-profile
+
+      - name: Disable Jekyll
+        run: touch src/TdtsWeb/output/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: src/TdtsWeb/output
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

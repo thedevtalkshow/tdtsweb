@@ -1,0 +1,16 @@
+@* Date in a slab-serif box, echoing the logo's boxed THE / SHOW. *@
+<time class="datebox" datetime="@Date.ToString("yyyy-MM-dd", Inv)">
+    <span class="datebox__month">@Date.ToString("MMM", Inv)</span>
+    <span class="datebox__day">@Date.Day</span>
+    @if (ShowYear ?? Date.Year != DateTime.Now.Year)
+    {
+        <span class="datebox__year">@Date.Year</span>
+    }
+</time>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+    [Parameter, EditorRequired] public DateTime Date { get; set; }
+    /// <summary>Null = show the year only when it is not the current year.</summary>
+    [Parameter] public bool? ShowYear { get; set; }
+}

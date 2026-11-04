@@ -1,0 +1,37 @@
+@page "/about"
+
+<PageTitle>About · @SiteInfo.Title</PageTitle>
+
+<article class="article">
+    <h1>About the show</h1>
+    <div class="prose">
+        <p>
+            The Dev Talk Show is developers doing what developers do, streamed live at @SiteInfo.LiveTime @SiteInfo.LiveWhen
+            Recordings of every show are on <a href="@SiteInfo.YouTube" target="_blank" rel="noopener noreferrer">YouTube</a>.
+        </p>
+
+        <h2>Hosts</h2>
+    </div>
+    <div class="hosts">
+        @foreach (var person in People.All)
+        {
+            <div class="host">
+                @if (person.Photo is { } photo)
+                {
+                    <img src="@photo" alt="" width="96" height="96" loading="lazy"/>
+                }
+                <div>
+                    <h3>@person.Name</h3>
+                    <p>Co-host</p>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="prose">
+        <h2>Friends of the show</h2>
+        <ul>
+            <li><a href="https://www.meetup.com/philly-net/" target="_blank" rel="noopener noreferrer">Philly.NET</a>, the Philadelphia-area .NET user group.</li>
+            <li><a href="https://techbash.com" target="_blank" rel="noopener noreferrer">TechBash</a>, a developer conference in the Poconos.</li>
+        </ul>
+    </div>
+</article>

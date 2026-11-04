@@ -1,0 +1,70 @@
+@page "/blog"
+@page "/blog/{fileName}"
+@inject BlazorStaticContentService<PostFrontMatter> PostService
+
+@if (string.IsNullOrWhiteSpace(FileName))
+{
+    <PageTitle>Blog · @SiteInfo.Title</PageTitle>
+    <header class="page-head">
+        <h1>Blog</h1>
+        <p>Notes, how-tos, and follow-ups from the show.</p>
+    </header>
+    <PostsList/>
+    return;
+}
+
+@if (_post == null)
+{
+    <PageTitle>Post not found · @SiteInfo.Title</PageTitle>
+    <div class="page-head"><h1>Post not found</h1><p><a href="blog">See all posts</a></p></div>
+    return;
+}
+
+@{ var fm = _post.FrontMatter; }
+<PageTitle>@fm.Title · @SiteInfo.Title</PageTitle>
+<HeadContent>
+    <meta name="description" content="@fm.Lead"/>
+</HeadContent>
+
+<article class="article">
+    <header class="article__head">
+        <Datebox Date="fm.Published" ShowYear="true"/>
+        <div>
+            <h1>@fm.Title</h1>
+            <p class="article__byline">
+                @if (fm.Authors.Count > 0)
+                {
+                    <span>By @string.Join(" and ", fm.Authors.Select(a => People.Resolve(a).Name))</span>
+                }
+                @if (fm.Updated is { } updated)
+                {
+                    <span>. Updated @updated.ToString("MMMM d, yyyy", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</span>
+                }
+            </p>
+            <TagsComponent Tags="fm.Tags"/>
+        </div>
+    </header>
+
+    <div class="prose">
+        @((MarkupString)_post.HtmlContent)
+    </div>
+
+    <footer class="article__foot">
+        <a href="blog">All posts</a>
+        @if (SiteInfo.SourceUrl("Blog", FileName) is { } sourceUrl)
+        {
+            <a href="@sourceUrl" target="_blank" rel="noopener noreferrer">Suggest an edit</a>
+        }
+    </footer>
+</article>
+
+@code {
+    [Parameter] public string? FileName { get; set; }
+    private Post<PostFrontMatter>? _post;
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(FileName)) return;
+        _post = PostService.Posts.FirstOrDefault(x => x.Url == FileName);
+    }
+}

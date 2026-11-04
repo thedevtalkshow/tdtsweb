@@ -1,0 +1,15 @@
+@inject BlazorStaticContentService<PostFrontMatter> PostService
+
+@if (Tags.Count > 0)
+{
+    <ul class="tags" aria-label="Tags">
+        @foreach (var tag in Tags)
+        {
+            <li><a href="@PostService.Options.Tags.TagsPageUrl/@tag">@tag</a></li>
+        }
+    </ul>
+}
+
+@code {
+    [Parameter] public List<string> Tags { get; set; } = [];
+}

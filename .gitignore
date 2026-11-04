@@ -1,0 +1,36 @@
+# ---- .NET ----
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.DotSettings.user
+TestResults/
+
+# ---- BlazorStatic generated site ----
+output/
+
+# ---- Secrets & local config ----
+appsettings.Development.json
+appsettings.*.local.json
+secrets.json
+*.env
+.env*
+*.PublishSettings
+*.pubxml
+*.pubxml.user
+.azure/
+
+# ---- AI / Claude: personal & scratch (shared config IS committed) ----
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/**/*.local.*
+.scratch/
+*.local.md
+
+# ---- Editors / OS ----
+.vscode/*
+!.vscode/extensions.json
+.idea/
+Thumbs.db
+.DS_Store

@@ -1,0 +1,37 @@
+@page "/tags"
+@page "/tags/{tagName}"
+@inject BlazorStaticContentService<PostFrontMatter> PostService
+
+@if (string.IsNullOrWhiteSpace(TagName))
+{
+    <PageTitle>Tags · @SiteInfo.Title</PageTitle>
+    <header class="page-head">
+        <h1>Tags</h1>
+        <p>Blog posts by topic.</p>
+    </header>
+    <ul class="tag-cloud">
+        @foreach (var group in PostService.Posts.SelectMany(x => x.Tags).GroupBy(x => x.Name).OrderByDescending(g => g.Count()).ThenBy(g => g.Key))
+        {
+            <li><a href="@PostService.Options.Tags.TagsPageUrl/@group.First().EncodedName">#@group.Key<span>@group.Count()</span></a></li>
+        }
+    </ul>
+    return;
+}
+
+<PageTitle>#@TagName · @SiteInfo.Title</PageTitle>
+<header class="page-head">
+    <h1>#@TagName</h1>
+    <p>Posts tagged @TagName. <a href="tags">All tags</a></p>
+</header>
+<PostsList Posts="_posts"/>
+
+@code {
+    [Parameter] public string? TagName { get; set; }
+    private List<Post<PostFrontMatter>> _posts = [];
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(TagName)) return;
+        _posts = PostService.Posts.Where(x => x.FrontMatter.Tags.Contains(TagName)).ToList();
+    }
+}

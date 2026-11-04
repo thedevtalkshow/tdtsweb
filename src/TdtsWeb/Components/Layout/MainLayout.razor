@@ -1,0 +1,22 @@
+@inherits LayoutComponentBase
+
+<NavMenu/>
+
+<main class="wrap">
+    @Body
+</main>
+
+<footer class="site-footer">
+    <div class="wrap">
+        <img src="img/tdts-logo.png" width="560" height="429" alt="" />
+        <div class="site-footer__links">
+            <a href="@SiteInfo.YouTube" target="_blank" rel="noopener noreferrer"><Svg Icon="Svg.Icons.YouTube"/>YouTube</a>
+            <a href="@SiteInfo.Twitch" target="_blank" rel="noopener noreferrer"><Svg Icon="Svg.Icons.Twitch"/>Twitch</a>
+            @if (!string.IsNullOrEmpty(SiteInfo.GitHubRepo))
+            {
+                <a href="@SiteInfo.GitHubRepo" target="_blank" rel="noopener noreferrer"><Svg Icon="Svg.Icons.Github"/>Source</a>
+            }
+        </div>
+        <p>© @DateTime.Now.Year @SiteInfo.Title. Built with <a href="https://github.com/tesar-tech/BlazorStatic">BlazorStatic</a>.</p>
+    </div>
+</footer>
